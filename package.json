@@ -1,0 +1,30 @@
+{
+  "name": "cppbb-bot",
+  "version": "1.0.0",
+  "description": "A directory bot for CPP Discord Servers",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "start-dev": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joshgarde/CPPBB-Bot.git"
+  },
+  "author": "Joshua Garde",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joshgarde/CPPBB-Bot/issues"
+  },
+  "homepage": "https://github.com/joshgarde/CPPBB-Bot#readme",
+  "dependencies": {
+    "discord.js": "^12.5.1",
+    "dotenv": "^8.2.0",
+    "mongoose": "^5.10.19",
+    "mongoose-fuzzy-searching": "^2.0.2",
+    "node-schedule": "^2.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
