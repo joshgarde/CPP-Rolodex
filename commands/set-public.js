@@ -24,7 +24,7 @@ async function setPublicCmd(message, command, input) {
       public: value
     }, { upsert: true, setDefaultsOnInsert: true });
 
-    await channel.send(`Public:\n> ${input ? 'Yes' : 'No'}`);
+    await channel.send(`Public: \`${value ? 'Yes' : 'No'}\``);
   } else {
     await channel.send(
       '`$cpp set-public [true/false]`\n' +
