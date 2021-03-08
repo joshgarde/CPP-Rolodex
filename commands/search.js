@@ -31,7 +31,7 @@ async function searchCmd(message, command, input) {
 
         sendQueue.push(embed);
       } catch (err) {
-        console.log(`[ERROR] ${err}`);
+        console.log(`[ERROR] ${JSON.stringify(err)}`);
       }
     }
 

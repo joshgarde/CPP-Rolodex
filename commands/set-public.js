@@ -19,10 +19,9 @@ async function setPublicCmd(message, command, input) {
     }
 
     let server = await Server.findOneAndUpdate({_id: guild.id}, {
-      _id: guild.id,
       name: guild.name,
       public: value
-    }, { upsert: true, setDefaultsOnInsert: true });
+    });
 
     await channel.send(`Public: \`${value ? 'Yes' : 'No'}\``);
   } else {

@@ -22,5 +22,18 @@ module.exports = {
         await channel.send('This command only works on servers');
       }
     }
+  },
+
+  findDefaultChannel(guild) {
+    // Attempt to guess default invite channel
+    if (guild.rulesChannelID) {
+      return guild.rulesChannelID;
+    } else if (guild.publicUpdatesChannelID) {
+      return guild.publicUpdatesChannelID;
+    } else {
+      // Default to first text channel listed
+      let channels = guild.channels.cache;
+      return channels.find(channel => channel.type === 'text').id;
+    }
   }
 }

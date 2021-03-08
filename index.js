@@ -2,8 +2,10 @@
 const Discord = require('discord.js');
 const mongoose = require('mongoose');
 const { scheduleJob } = require('node-schedule');
+const { findDefaultChannel } = require('./helpers');
 const Server = require('./models/server');
-const Vote = require('./models/vote');
+const { clearVotes, verifyGuilds } = require('./tasks');
+
 require('dotenv').config();
 
 const commandMap = {
@@ -30,8 +32,10 @@ async function processCommand(message, command, input) {
 async function readyHandler() {
   let { readyAt, user } = client;
 
+  await verifyGuilds();
   await client.user.setPresence({ activity: { name: 'Use `$cpp help` for more info' }});
   scheduleJob('0 0 * * *', clearVotes); // Clear leaderboard daily
+  scheduleJob('0 0 * * *', verifyGuilds(client)); // Verify servers daily
 
   console.log(` -- Ready at: ${readyAt.toLocaleString()}`);
   console.log(` -- Running as: ${user.username}#${user.discriminator}`);
@@ -44,16 +48,7 @@ async function guildCreateHandler(guild) {
     name: guild.name
   });
 
-  // Attempt to guess default invite channel
-  if (guild.rulesChannelID) {
-    server.defaultChannel = guild.rulesChannelID;
-  } else if (guild.publicUpdatesChannelID) {
-    server.defaultChannel = guild.publicUpdatesChannelID;
-  } else {
-    // Default to first text channel listed
-    let channels = guild.channels.cache;
-    server.defaultChannel = channels.find(channel => channel.type === 'text').id;
-  }
+  server.defaultChannel = findDefaultChannel(guild);
 
   if (server.defaultChannel) {
     await server.save();
@@ -82,10 +77,6 @@ async function messageHandler(message) {
       message.channel.send('An unhandled error occurred - message josh®#7081 for assistance');
     });
   }
-}
-
-async function clearVotes() {
-  await Vote.collection.drop();
 }
 
 const dbOptions = {
