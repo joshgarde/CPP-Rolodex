@@ -26,27 +26,30 @@ module.exports = {
 
   findDefaultChannel(guild, user) {
     // Attempt to guess default invite channel
-    if (guild.rulesChannelID) {
-      return guild.rulesChannelID;
-    } else if (guild.publicUpdatesChannelID) {
-      return guild.publicUpdatesChannelID;
-    } else {
-      // Default to first text channel listed
-      let channels = guild.channels.cache;
-      let firstText = channels.find((channel) => {
-        if (channel.type !== 'text') return false;
-
-        let permissions = channel.permissionsFor(user);
-        if (!permissions) return false;
-
-        return permissions.has(Permissions.FLAGS.CREATE_INSTANT_INVITE);
-      });
-
-      if (firstText) {
-        return firstText.id;
-      } else {
-        return null;
-      }
+    if (guild.rulesChannel) {
+      let permissions = guild.rulesChannel.permissionsFor(user);
+      if (permissions && permissions.has(Permissions.FLAGS.CREATE_INSTANT_INVITE))
+        return guild.rulesChannel.id;
     }
+
+    if (guild.publicUpdatesChannel) {
+      let permissions = guild.publicUpdatesChannel.permissionsFor(user);
+      if (permissions && permissions.has(Permissions.FLAGS.CREATE_INSTANT_INVITE))
+        return guild.publicUpdatesChannel.id;
+    }
+
+    // Default to first text channel listed
+    let channels = guild.channels.cache;
+    let firstText = channels.find((channel) => {
+      if (channel.type !== 'text') return false;
+
+      let permissions = channel.permissionsFor(user);
+      if (!permissions) return false;
+
+      return permissions.has(Permissions.FLAGS.CREATE_INSTANT_INVITE);
+    });
+    if (firstText) return firstText.id;
+
+    return null;
   }
 }

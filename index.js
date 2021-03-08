@@ -66,7 +66,7 @@ async function guildDeleteHandler(guild) {
 async function messageHandler(message) {
   if (message.author.id === client.user.id) return; // knockdown echo chambers
 
-  let content = (/\$cpp (\S*) ?(.*$)/gi).exec(message.content);
+  let content = (/^\$cpp (\S*) ?(.*$)/gi).exec(message.content);
 
   if (content) {
     let command = content[1].toLowerCase().trim();
