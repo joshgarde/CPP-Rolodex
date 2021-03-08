@@ -22,7 +22,7 @@ const commandMap = {
 const client = new Discord.Client();
 
 async function processCommand(message, command, input) {
-  if (commandMap[command]) {
+  if (command in commandMap) {
     await commandMap[command](message, command, input);
   } else {
     await channel.send(`${command}: command not found.`)
