@@ -33,7 +33,23 @@ module.exports = {
     } else {
       // Default to first text channel listed
       let channels = guild.channels.cache;
-      return channels.find(channel => channel.type === 'text').id;
+      let firstText = channels.find((channel) => {
+        if (channel.type !== 'text')
+          return false;
+
+        let permissions = channel.permissionsFor(guild.roles.everyone);
+        if (!permissions)
+          return false;
+
+        return permissions.has(Permissions.FLAGS.VIEW_CHANNEL) && permissions.has(Permissions.FLAGS.CREATE_INSTANT_INVITE);
+      });
+
+      if (firstText) {
+        console.log(firstText.name);
+        return firstText.id;
+      } else {
+        return null;
+      }
     }
   }
 }

@@ -10,6 +10,8 @@ function verifyGuilds(client) {
       let guild = guilds[i];
       let server = await Server.findOne({_id: guild.id});
 
+      console.log(findDefaultChannel(guild));
+
       if (!server) {
         server = new Server({
           _id: guild.id,
