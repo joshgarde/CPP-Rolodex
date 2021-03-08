@@ -15,7 +15,7 @@ async function setDescriptionCmd(message, command, input) {
     let server = await Server.findOneAndUpdate({_id: guild.id}, {
       name: guild.name,
       description: input
-    });
+    }, { new: true });
 
     await channel.send(`Updated description:\n> ${server.description}`);
   } else {

@@ -21,9 +21,9 @@ async function setPublicCmd(message, command, input) {
     let server = await Server.findOneAndUpdate({_id: guild.id}, {
       name: guild.name,
       public: value
-    });
+    }, { new: true });
 
-    await channel.send(`Public: \`${value ? 'Yes' : 'No'}\``);
+    await channel.send(`Public: \`${server.public ? 'Yes' : 'No'}\``);
   } else {
     await channel.send(
       '`$cpp set-public [true/false]`\n' +

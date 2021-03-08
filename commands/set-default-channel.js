@@ -4,7 +4,7 @@ const Server = require('../models/server');
 async function setDefaultChannelCmd(message, command, input) {
   let { channel, guild } = message;
 
-  let server = await Server.findOneAndUpdate({_id: guild.id}, {
+  await Server.findOneAndUpdate({_id: guild.id}, {
     name: guild.name,
     defaultChannel: channel.id
   });
