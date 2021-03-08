@@ -1,3 +1,4 @@
+const { findDefaultChannel } = require('../helpers');
 const Server = require('../models/server');
 const Vote = require('../models/vote');
 
