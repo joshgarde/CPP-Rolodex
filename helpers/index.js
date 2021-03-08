@@ -24,7 +24,7 @@ module.exports = {
     }
   },
 
-  findDefaultChannel(guild) {
+  findDefaultChannel(guild, user) {
     // Attempt to guess default invite channel
     if (guild.rulesChannelID) {
       return guild.rulesChannelID;
@@ -34,18 +34,16 @@ module.exports = {
       // Default to first text channel listed
       let channels = guild.channels.cache;
       let firstText = channels.find((channel) => {
-        if (channel.type !== 'text')
-          return false;
+        if (channel.type !== 'text') return false;
 
-        let permissions = channel.permissionsFor(guild.roles.everyone);
-        if (!permissions)
-          return false;
+        let permissions = channel.permissionsFor(user);
+        if (!permissions) return false;
 
-        return permissions.has(Permissions.FLAGS.VIEW_CHANNEL) && permissions.has(Permissions.FLAGS.CREATE_INSTANT_INVITE);
+        return permissions.has(Permissions.FLAGS.CREATE_INSTANT_INVITE);
       });
 
       if (firstText) {
-        console.log(firstText.name);
+        console.log(`${firstText.name}`);
         return firstText.id;
       } else {
         return null;

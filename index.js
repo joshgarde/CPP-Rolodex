@@ -48,7 +48,7 @@ async function guildCreateHandler(guild) {
     name: guild.name
   });
 
-  server.defaultChannel = findDefaultChannel(guild);
+  server.defaultChannel = findDefaultChannel(guild, client.user);
 
   if (server.defaultChannel) {
     await server.save();

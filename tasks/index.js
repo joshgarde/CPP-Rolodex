@@ -10,13 +10,11 @@ function verifyGuilds(client) {
       let guild = guilds[i];
       let server = await Server.findOne({_id: guild.id});
 
-      console.log(findDefaultChannel(guild));
-
       if (!server) {
         server = new Server({
           _id: guild.id,
           name: guild.name,
-          defaultChannel: findDefaultChannel(guild)
+          defaultChannel: findDefaultChannel(guild, client.user)
         });
 
         await server.save();
