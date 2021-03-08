@@ -43,7 +43,6 @@ module.exports = {
       });
 
       if (firstText) {
-        console.log(`${firstText.name}`);
         return firstText.id;
       } else {
         return null;

@@ -73,7 +73,7 @@ async function messageHandler(message) {
     let input = content[2].trim();
 
     processCommand(message, command, input).catch((e) => {
-      console.log(`[ERROR] ${e}`);
+      console.log(`[ERROR] ${JSON.stringify(e)}`);
       message.channel.send('An unhandled error occurred - message josh®#7081 for assistance');
     });
   }
