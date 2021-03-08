@@ -32,7 +32,7 @@ async function processCommand(message, command, input) {
 async function readyHandler() {
   let { readyAt, user } = client;
 
-  await verifyGuilds();
+  await (verifyGuilds(client))();
   await client.user.setPresence({ activity: { name: 'Use `$cpp help` for more info' }});
   scheduleJob('0 0 * * *', clearVotes); // Clear leaderboard daily
   scheduleJob('0 0 * * *', verifyGuilds(client)); // Verify servers daily
