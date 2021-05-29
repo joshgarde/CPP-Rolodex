@@ -1,6 +1,6 @@
 const { Permissions } = require('discord.js');
 const { adminOnly, textOnly } = require('../helpers');
-const Server = require('../models/server');
+const { Server } = require('../db/models');
 
 async function setDefaultChannelCmd(message, command, input) {
   let { channel, guild } = message;
@@ -28,10 +28,10 @@ async function setDefaultChannelCmd(message, command, input) {
     newChannel = suppliedChannel;
   }
 
-  await Server.findOneAndUpdate({_id: guild.id}, {
+  await Server.update({
     name: guild.name,
     defaultChannel: newChannel.id
-  });
+  }, {where: {id: guild.id}});
 
   await channel.send(`Updated default invite channel: #${newChannel.name}`);
 }

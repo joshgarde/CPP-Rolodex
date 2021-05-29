@@ -1,5 +1,5 @@
 const { adminOnly, textOnly } = require('../helpers');
-const Server = require('../models/server');
+const { Server } = require('../db/models');
 
 async function setDescriptionCmd(message, command, input) {
   let { channel } = message;
@@ -12,12 +12,12 @@ async function setDescriptionCmd(message, command, input) {
 
     let guild = channel.guild;
 
-    let server = await Server.findOneAndUpdate({_id: guild.id}, {
+    let server = await Server.update({
       name: guild.name,
       description: input
-    }, { new: true });
+    }, {where: {id: guild.id}});
 
-    await channel.send(`Updated description:\n> ${server.description}`);
+    await channel.send(`Updated description:\n> ${input}`);
   } else {
     await channel.send(
       '`$cpp set-description [Server Description Text]`\n' +

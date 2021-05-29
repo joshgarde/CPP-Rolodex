@@ -1,6 +1,5 @@
 const { findDefaultChannel } = require('../helpers');
-const Server = require('../models/server');
-const Vote = require('../models/vote');
+const { Server } = require('../db/models');
 
 function verifyGuilds(client) {
   return async function _verifyGuilds() {
@@ -8,11 +7,11 @@ function verifyGuilds(client) {
 
     for (let i = 0; i < guilds.length; i++) {
       let guild = guilds[i];
-      let server = await Server.findOne({_id: guild.id});
+      let server = await Server.findOne({where: {id: guild.id}});
 
       if (!server) {
         server = new Server({
-          _id: guild.id,
+          id: guild.id,
           name: guild.name,
           defaultChannel: findDefaultChannel(guild, client.user)
         });

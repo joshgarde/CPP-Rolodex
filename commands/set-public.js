@@ -1,5 +1,5 @@
 const { adminOnly, textOnly } = require('../helpers');
-const Server = require('../models/server');
+const { Server } = require('../db/models');
 
 async function setPublicCmd(message, command, input) {
   let { channel } = message;
@@ -18,12 +18,12 @@ async function setPublicCmd(message, command, input) {
       return;
     }
 
-    let server = await Server.findOneAndUpdate({_id: guild.id}, {
+    let server = await Server.update({
       name: guild.name,
       public: value
-    }, { new: true });
+    }, {where: {id: guild.id}});
 
-    await channel.send(`Public: \`${server.public ? 'Yes' : 'No'}\``);
+    await channel.send(`Public: \`${value ? 'Yes' : 'No'}\``);
   } else {
     await channel.send(
       '`$cpp set-public [true/false]`\n' +

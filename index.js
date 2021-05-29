@@ -1,22 +1,22 @@
 'use strict';
+require('dotenv').config();
+
 const Discord = require('discord.js');
-const mongoose = require('mongoose');
 const { scheduleJob } = require('node-schedule');
 const { findDefaultChannel } = require('./helpers');
-const Server = require('./models/server');
+const { Server, sequelize } = require('./db/models');
 const { clearVotes, verifyGuilds } = require('./tasks');
-
-require('dotenv').config();
 
 const commandMap = {
   'about': require('./commands/about'),
+  'add-invite': require('./commands/add-invite'),
   'help': require('./commands/help'),
-  'leaderboard': require('./commands/leaderboard'),
+  //'leaderboard': require('./commands/leaderboard'),
   'search': require('./commands/search'),
   'set-default-channel': require('./commands/set-default-channel'),
   'set-description': require('./commands/set-description'),
   'set-public': require('./commands/set-public'),
-  'vote': require('./commands/vote')
+  //'vote': require('./commands/vote')
 };
 
 const client = new Discord.Client();
@@ -32,9 +32,9 @@ async function processCommand(message, command, input) {
 async function readyHandler() {
   let { readyAt, user } = client;
 
-  await (verifyGuilds(client))();
   await client.user.setPresence({ activity: { name: 'Use `$cpp help` for more info' }});
-  scheduleJob('0 0 * * *', clearVotes); // Clear leaderboard daily
+  await (verifyGuilds(client))();
+  //scheduleJob('0 0 * * *', clearVotes); // Clear leaderboard daily
   scheduleJob('0 0 * * *', verifyGuilds(client)); // Verify servers daily
 
   console.log(` -- Ready at: ${readyAt.toLocaleString()}`);
@@ -44,7 +44,7 @@ async function readyHandler() {
 
 async function guildCreateHandler(guild) {
   let server = new Server({
-    _id: guild.id,
+    id: guild.id,
     name: guild.name
   });
 
@@ -59,14 +59,14 @@ async function guildCreateHandler(guild) {
 }
 
 async function guildDeleteHandler(guild) {
-  await Server.deleteOne({_id: guild.id});
+  await Server.destroy({where: {id: guild.id}});
   console.log(`Deleted server: ${guild.name}; id: ${guild.id}`);
 }
 
 async function messageHandler(message) {
   if (message.author.id === client.user.id) return; // knockdown echo chambers
 
-  let content = (/^\$cpp (\S*) ?(.*$)/gi).exec(message.content);
+  let content = (/\$cpp (\S*) ?(.*$)/gi).exec(message.content);
 
   if (content) {
     let command = content[1].toLowerCase().trim();
@@ -79,14 +79,7 @@ async function messageHandler(message) {
   }
 }
 
-const dbOptions = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-  useFindAndModify: false,
-  useCreateIndex: true
-};
-
-mongoose.connect(process.env.DATABASE_URI, dbOptions).then(() => {
+sequelize.authenticate().then(() => {
   client.on('ready', readyHandler);
   client.on('guildCreate', guildCreateHandler);
   client.on('guildDelete', guildDeleteHandler);

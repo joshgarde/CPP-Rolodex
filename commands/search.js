@@ -1,33 +1,49 @@
 const Discord = require('discord.js');
-const Server = require('../models/server');
+const { Server } = require('../db/models');
 
 async function searchCmd(message, command, input) {
   let { channel, client } = message;
 
   if (input.length > 0) {
     let start = Date.now();
-    let results = await Server.fuzzySearch(input, { public: true });
+    let results = await Server.search(input)
     let sendQueue = [];
 
-    for (let i = 0; i < (results.length > 5 ? 5 : results.length); i++) {
+    for (let i = 0; i < results.length; i++) {
       try {
         let result = results[i];
-        let guild = await client.guilds.fetch(result._id);
-        let defaultChannel = await client.channels.fetch(result.defaultChannel);
-        let invite = await defaultChannel.createInvite();
+        let name, online, members, iconURL, inviteURL;
 
-        if (!guild.approximateMemberCount && !guild.approximatePresenceCount) {
-          guild = await guild.fetch(); // Fail-safe incase values aren't properly filled
+        if (result.invite) {
+          let invite = await client.fetchInvite(result.invite);
+          name = invite.guild.name;
+          iconURL = invite.guild.iconURL({size: 512});
+          online = invite.presenceCount;
+          members = invite.memberCount;
+          inviteURL = invite.url;
+        } else {
+          let guild = await client.guilds.fetch(result.id);
+          let defaultChannel = await client.channels.fetch(result.defaultChannel);
+          let invite = await defaultChannel.createInvite();
+
+          if (!guild.approximateMemberCount && !guild.approximatePresenceCount)
+            guild = await guild.fetch();
+
+          name = guild.name;
+          iconURL = guild.iconURL({size: 512});
+          online = guild.approximatePresenceCount;
+          members = guild.approximateMemberCount;
+          inviteURL = invite.url;
         }
 
         let embed = new Discord.MessageEmbed()
           .setColor('#0099ff')
-          .setTitle(guild.name)
+          .setTitle(name)
           .setDescription(result.description ? result.description : '- - -')
-          .addField('Online', guild.approximatePresenceCount, true)
-          .addField('Members', guild.approximateMemberCount, true)
-          .setThumbnail(guild.iconURL({size: 512}))
-          .setURL(invite.url);
+          .addField('Online', online, true)
+          .addField('Members', members, true)
+          .setThumbnail(iconURL)
+          .setURL(inviteURL);
 
         sendQueue.push(embed);
       } catch (err) {
