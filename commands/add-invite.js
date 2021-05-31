@@ -5,7 +5,7 @@ const OWNER_ID = process.env.OWNER
 
 async function addInviteCmd(message, command, input) {
   let { channel, client } = message;
-  let user = client.user;
+  let user = message.author;
 
   if (user.id != OWNER_ID) return;
 
