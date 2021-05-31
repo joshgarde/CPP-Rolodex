@@ -1,8 +1,8 @@
 const { findDefaultChannel } = require('../helpers');
 const { Server } = require('../db/models');
 
-function verifyGuilds(client) {
-  return async function _verifyGuilds() {
+function ensureGuilds(client) {
+  return async function _ensureGuilds() {
     let guilds = client.guilds.cache.array();
 
     for (let i = 0; i < guilds.length; i++) {
@@ -25,8 +25,34 @@ function verifyGuilds(client) {
   }
 }
 
+function verifyGuilds(client) {
+  return async function _verifyGuilds() {
+    let servers = await Server.findAll();
+
+    for (let i = 0; i < servers.length; i++) {
+      let server = servers[i];
+
+      if (server.invite) {
+        try {
+          await client.fetchInvite(server.invite);
+        } catch (err) {
+          if (err.code && err.code === 10006) { // Invalid invite
+            await server.destroy(); // Delete from db
+          }
+        }
+      } else {
+        if (!client.guilds.cache.has(server.id)) {
+          // Server likely kicked bot
+          await server.destroy(); // Delete from db
+        }
+      }
+
+    }
+  }
+}
+
 async function clearVotes() {
   await Vote.collection.drop();
 }
 
-module.exports = { verifyGuilds, clearVotes };
+module.exports = { ensureGuilds, verifyGuilds, clearVotes };

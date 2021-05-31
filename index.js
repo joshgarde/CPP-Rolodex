@@ -5,7 +5,7 @@ const Discord = require('discord.js');
 const { scheduleJob } = require('node-schedule');
 const { findDefaultChannel } = require('./helpers');
 const { Server, sequelize } = require('./db/models');
-const { clearVotes, verifyGuilds } = require('./tasks');
+const { clearVotes, ensureGuilds, verifyGuilds } = require('./tasks');
 
 const commandMap = {
   'about': require('./commands/about'),
@@ -34,8 +34,12 @@ async function readyHandler() {
 
   await client.user.setPresence({ activity: { name: 'Use `$cpp help` for more info' }});
   await (verifyGuilds(client))();
+  await (ensureGuilds(client))();
   //scheduleJob('0 0 * * *', clearVotes); // Clear leaderboard daily
-  scheduleJob('0 0 * * *', verifyGuilds(client)); // Verify servers daily
+
+  // Server verification tasks
+  scheduleJob('0 0 * * *', verifyGuilds(client));
+  scheduleJob('0 10 * * *', ensureGuilds(client));
 
   console.log(` -- Ready at: ${readyAt.toLocaleString()}`);
   console.log(` -- Running as: ${user.username}#${user.discriminator}`);
