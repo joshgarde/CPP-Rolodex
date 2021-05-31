@@ -7,10 +7,13 @@ async function addInviteCmd(message, command, input) {
   let { channel, client } = message;
   let user = message.author;
 
-  if (user.id != OWNER_ID) return;
+  if (user.id != OWNER_ID) {
+    await channel.send('Contact @josh®#7081 to add a server');
+    return;
+  }
 
   let inviteCode = /^((https:\/\/)?discord.gg\/)?(.{7,20})/.exec(input);
-  if (!inviteCode) {
+  if (!inviteCode || !inviteCode[3]) {
     await channel.send(`Invalid invite code`);
     return;
   }
