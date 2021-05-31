@@ -1,0 +1,11 @@
+<dataConfig>
+  <dataSource type="JdbcDataSource" name="imdb-title-rating" driver="org.postgresql.Driver" url="jdbc:postgresql://172.17.0.1:5432/rolodex" user="username" password="password" />
+  <document name="Server">
+    <entity name="Server" query="SELECT * FROM public.&quot;Servers&quot;;">
+      <field column="id" name="id" />
+      <field column="name" name="name" />
+      <field column="description" name="description" />
+      <field column="public" name="public" />
+    </entity>
+  </document>
+</dataConfig>
